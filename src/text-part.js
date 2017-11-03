@@ -243,7 +243,6 @@ class TextPart {
             link,
         }
     }
-
 }
 
 module.exports = TextPart
