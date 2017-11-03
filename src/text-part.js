@@ -1,6 +1,13 @@
 const iterateRegex = require('regex-foreach')
 
 class TextPart {
+    /**
+     *
+     * @param name - The name to describe all text types which are processed by the TextPart instance.
+     * @param sections - An array of section identifiers. (RegExp/string)
+     * @param identifiers - An array of highlight identifiers. (RegExp/string)
+     * @param config - Configuration options to define how TextPart transforms.
+     */
     constructor({
         name = "",
         sections = [],
