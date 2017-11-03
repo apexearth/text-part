@@ -1,21 +1,3 @@
-## Classes
-
-<dl>
-<dt><a href="#TextPart">TextPart</a></dt>
-<dd></dd>
-</dl>
-
-## Functions
-
-<dl>
-<dt><a href="#flatten">flatten(array)</a> ⇒ <code>Array</code></dt>
-<dd><p>Flatten an array.</p>
-</dd>
-<dt><a href="#createRegExp">createRegExp(regex, regexSafe)</a> ⇒ <code>RegExp</code></dt>
-<dd><p>Create a RegExp object from a string or RegExp object.</p>
-</dd>
-</dl>
-
 <a name="TextPart"></a>
 
 ## TextPart
@@ -106,27 +88,4 @@ Add a section identifier. This is regex which will split the text blob when foun
 | identifier | <code>RegExp</code> \| <code>String</code> | The RegExp to use for identification. |
 | data | <code>object</code> | Data to associate with the identifier and anything the identifier creates. |
 | config | <code>object</code> | The config options to use. |
-
-<a name="flatten"></a>
-
-## flatten(array) ⇒ <code>Array</code>
-Flatten an array.
-
-**Kind**: global function  
-
-| Param | Type |
-| --- | --- |
-| array | <code>Array.&lt;Array&gt;</code> | 
-
-<a name="createRegExp"></a>
-
-## createRegExp(regex, regexSafe) ⇒ <code>RegExp</code>
-Create a RegExp object from a string or RegExp object.
-
-**Kind**: global function  
-
-| Param | Type | Default | Description |
-| --- | --- | --- | --- |
-| regex | <code>object</code> \| <code>RegExp</code> |  | The regex to create a RegExp from. |
-| regexSafe |  | <code>false</code> | Do we need to escape certain characters in `regex`? |
 

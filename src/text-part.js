@@ -311,6 +311,7 @@ module.exports = TextPart
  * Flatten an array.
  * @param array {Array.<Array>}
  * @returns {Array}
+ * @private
  */
 function flatten(array) {
     return [].concat.apply([], array)
@@ -321,6 +322,7 @@ function flatten(array) {
  * @param regex {object|RegExp} - The regex to create a RegExp from.
  * @param regexSafe - Do we need to escape certain characters in `regex`?
  * @returns {RegExp}
+ * @private
  */
 function createRegExp(regex, regexSafe = false) {
     if (regex.constructor !== RegExp) {
