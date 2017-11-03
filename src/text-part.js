@@ -112,12 +112,19 @@ class TextPart {
         this.rules.identifiers.push(identifier)
     }
 
-    _transformSections(title, split) {
+    /**
+     * Transform an array of lines into an array of sections.
+     * @param title - Start off with a section of this name.
+     * @param lines - The lines to transform into sections.
+     * @returns {Array} - An array containing the sections.
+     * @private
+     */
+    _transformSections(title, lines) {
         let currentSection = this._createTransformedSection(title, [], {})
         let sections       = [currentSection]
         // Loop through each line and load them into sections.
         // Create new sections on the go as section matches are found.
-        split.forEach((parts) => {
+        lines.forEach((parts) => {
             // Create a new section, if needed.
             this.rules.sections.forEach(sectionIdentifier => {
                 for (let i in parts) {
