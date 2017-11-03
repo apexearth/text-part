@@ -1,0 +1,13 @@
+language: node_js
+node_js:
+- '8'
+script:
+- npm test
+deploy:
+  provider: npm
+  email: apexearth@gmail.com
+  api_key:
+    secure: lJ75rxhnMShhGCvNxEhJoFf9ydtjmZLRHa2KMn4q8wgH8r/3FbJ4AnmyrT3Z0Fe7TP0eqlh/mImoqho2sTsJ39tKznOafNBGzYM6fN2Dua/sKy3RoM3x0uDQuIYJ9m20BD9Cve2LsPp2qhcMo9u9105KR/w2zYBkNZXMAzqlUxB4+Ux97RspUptLxac78mu8P4PiWn1DLXbB31+cuLAt0ndabgRzcaniO6qa9ZYFt4dT5gPzzkKEslg5RooymmWzO0p2V8SusmC+Vs5jYVQTZu5YURJa8Cq27rOg1xXo0Dx9pmnEXBAJxBJW5mmn9KW0t+GygRLiR1gjjqScaDvVnAZB4+Qm+HEN7YPh1M6+JwmPvNBqtM2Iay3gaaFwU5e0ky8Bxjhq+ILcSpcUfdPkXZqr0NozXUvWuk+kKXPSA5ddPo2o38wmxGdUsJ2z3cMbijxaho+i4+uF/i49GYHWp5dYtqSaIFD99J6GKRInLUf8RqnPkNllPoP53P96dQEGQPTHwW8OD1RCoKQr3DqYKoR3ayo0FzGlup4GBDFwGvHmn58ItCmfZsuQ7HDm59SLBsXSwIndcWvp5aqVqIs4mbaFmpY2wvM+m5Y4Z9MmS85eAIFcRM1q4suaVpD7CEbyUFnIqqH+kOYRTSmFgUdi++6B15YqsXb4v/HStbwAwTU=
+  on:
+    tags: true
+    repo: apexearth/text-part
