@@ -5,7 +5,7 @@ class TextPart {
      *
      * @param name - The name to describe all text types which are processed by the TextPart instance.
      * @param sections - An array of section identifiers. (RegExp/string)
-     * @param identifiers - An array of highlight identifiers. (RegExp/string)
+     * @param identifiers - An array of identifiers. (RegExp/string)
      * @param config - Configuration options to define how TextPart transforms.
      */
     constructor({
@@ -31,15 +31,14 @@ class TextPart {
      * Transform a file data string into an array of parts.
      * The top level array represents the lines.
      * The arrays, called parts, within each line represent parts within the line.
-     *   Some parts are simple strings, others represent things such as highlights.
-     * @param text
-     * @param sectionsExpanded (default: false)
+     *   Some parts are simple strings, others represent things such as identifiers.
+     * @param text - The text to transform into parts.
      * @returns {Array}
      */
-    transform(text, sectionsExpanded = false) {
+    transform(text) {
         let split = this._split(text)
-        split     = this._transformSections(this.name || split[0][0], split, sectionsExpanded)
-        split     = this._transformHighlights(split)
+        split     = this._transformSections(this.name || split[0][0], split)
+        split     = this._transformIdentifiers(split)
         return split
     }
 
@@ -75,44 +74,37 @@ class TextPart {
     }
 
     loadIdentifiers(identifiers) {
-        for (let level in identifiers) {
-            if (!identifiers.hasOwnProperty(level)) continue
-            for (let i in identifiers[level]) {
-                if (!identifiers[level].hasOwnProperty(i)) continue
-                let identifier = identifiers[level][i]
-                if (typeof identifier.regex === 'object' && identifier.regex.length) { // regex exists and is an array
-                    if (identifier.highlight === false) continue
-                    for (let regexIndex = 0; regexIndex < identifier.regex.length; regexIndex++) {
-                        this.addIdentifier(identifier.regex[regexIndex], level, identifier.description, identifier.link)
-                    }
-                } else if (identifier.regex) {
-                    if (identifier.highlight === false) continue
-                    this.addIdentifier(identifier.regex, level, identifier.description, identifier.link)
-                } else { // Identifier is probably (and should be) a string
-                    this.addIdentifier(identifier, level)
+        for (let i in identifiers) {
+            if (!identifiers.hasOwnProperty(i)) continue
+            let identifier = identifiers[i]
+            if (typeof identifier.regex === 'object' && identifier.regex.length) { // regex exists and is an array
+                for (let regexIndex = 0; regexIndex < identifier.regex.length; regexIndex++) {
+                    this.addIdentifier(identifier.regex[regexIndex], identifier.data)
                 }
+            } else if (identifier.regex) {
+                this.addIdentifier(identifier.regex, identifier.data)
+            } else { // Identifier is probably (and should be) a string
+                this.addIdentifier(identifier, {})
             }
         }
     }
 
     /**
-     * @param sectionIdentifier {string} (regex as string)
+     * Add a section identifier. This is regex which will split the text blob when found.
+     * @param identifier
+     * @param data
      */
-    addSectionIdentifier(sectionIdentifier) {
-        let regex    = sectionIdentifier.regex || sectionIdentifier
-        let norepeat = sectionIdentifier.norepeat
-        this.rules.sections.push(this._createSectionIdentifier(regex, norepeat))
+    addSectionIdentifier(identifier, data = {}) {
+        this.rules.sections.push(this._createSectionIdentifier(identifier, data))
     }
 
     /**
      * @param identifier {object} as created by .createIdentifier
-     * @param level {string}
-     * @param description {string}
-     * @param link {string}
+     * @param data
      */
-    addIdentifier(identifier, level = 'general', description, link) {
+    addIdentifier(identifier, data = {}) {
         if (typeof identifier === 'string' || identifier.constructor === RegExp) {
-            identifier = this._createIdentifier(identifier, level, description, link)
+            identifier = this._createIdentifier(identifier, data)
         }
         if (identifier.type !== 'identifier') {
             throw new Error(`Tried to add something which was not an identifier. (${identifier} (${typeof identifier}))`)
@@ -120,8 +112,8 @@ class TextPart {
         this.rules.identifiers.push(identifier)
     }
 
-    _transformSections(title, split, sectionsExpanded) {
-        let currentSection = this._createSection(title, null, sectionsExpanded)
+    _transformSections(title, split) {
+        let currentSection = this._createTransformedSection(title, [], {})
         let sections       = [currentSection]
         // Loop through each line and load them into sections.
         // Create new sections on the go as section matches are found.
@@ -134,46 +126,29 @@ class TextPart {
                     let match = null
                     if (match = sectionIdentifier.regex.exec(part)) {
                         if (sectionIdentifier.norepeat && match[0] === currentSection.match) continue // Skip
-                        currentSection = this._createSection(part, match[0], sectionsExpanded)
+                        currentSection = this._createTransformedSection(part, [], sectionIdentifier.data)
                         sections.push(currentSection)
                         break
                     }
                 }
             })
             // Add parts line to current section.
-            currentSection.data.push(parts)
-            currentSection.disabled = false
+            currentSection.lines.push(parts)
         })
         return sections
     }
 
-    _transformHighlights(split) {
-        const highestLevel = (data) => {
-            let highestLevel = undefined
-            data.forEach(parts =>
-                parts.forEach(part => {
-                    if (highestLevel === undefined && part.level === 'general')
-                        highestLevel = 'general'
-                    else if ((highestLevel === undefined || highestLevel === 'general') && part.level === 'important')
-                        highestLevel = 'important'
-                    else if ((highestLevel === undefined || highestLevel === 'general' || highestLevel === 'important') && part.level === 'critical')
-                        highestLevel = 'critical'
-                })
-            )
-            return highestLevel
-        }
-
+    _transformIdentifiers(split) {
         const iterateIdentifiers = (parts) => {
             this.rules.identifiers.forEach(identifier => {
-                parts = this._transformHighlight(parts, identifier)
+                parts = this._transformIdentifier(parts, identifier)
             })
             return parts
         }
 
         return split.map(function (parts) {
             if (parts.type === 'section') {
-                parts.data  = parts.data.map(iterateIdentifiers)
-                parts.level = highestLevel(parts.data)
+                parts.lines = parts.lines.map(iterateIdentifiers)
             } else {
                 parts = iterateIdentifiers(parts)
             }
@@ -182,20 +157,18 @@ class TextPart {
     }
 
     /**
-     * Search collection of parts for highlights, insert highlights when found.
+     * Search collection of parts for identifiers, insert identifiers when found.
      * @param parts {Array|Object} An array of parts, or a section.
      * @param identifier {*}       The regex to match.
      * @returns {*}                A modification of parts.
      */
-    _transformHighlight(parts, identifier) {
+    _transformIdentifier(parts, identifier) {
         let {
                 regex,
-                level,
-                description,
-                link
+                data,
             } = identifier
 
-        // create a flat array of parts of strings or highlighted strings.
+        // create a flat array of parts of strings or identifier strings.
         let newParts        = flatten(parts.map(part => {
             if (typeof part !== 'string') return part
             let result    = []
@@ -203,7 +176,7 @@ class TextPart {
             iterateRegex(regex, part, (value, index) => {
                 result    = result.concat([
                     part.substring(lastIndex, index),
-                    this._createHighlight(value, level, description, link)
+                    this._createTransformedIdentifier(value, data)
                 ])
                 lastIndex = index + value.length
             })
@@ -214,40 +187,32 @@ class TextPart {
         return newParts
     }
 
-    _createHighlight(string, level = 'general', description, link) {
-        return {
-            type: 'highlight',
-            level,
-            data: string,
-            description,
-            link
-        }
+    _createTransformedIdentifier(text, data) {
+        return Object.assign({
+            type: 'identifier',
+            text,
+        }, data)
     }
 
-    _createSection(title, match, sectionsExpanded = false) {
-        return {
-            type    : 'section',
-            title   : title,
-            match   : match,
-            data    : [],
-            visible : sectionsExpanded,
-            disabled: true
-        }
+    _createTransformedSection(title, lines, data) {
+        return Object.assign({
+            type : 'section',
+            title: title,
+            lines: lines,
+        }, data)
     }
 
-    _createSectionIdentifier(regex, norepeat = false, level = 'general', description, link) {
-        let identifier      = this._createIdentifier(regex, level, description, link)
-        identifier.norepeat = norepeat
-        return identifier
+    _createSectionIdentifier(regex, data = {}) {
+        if (typeof data !== "object") throw new Error(`Invalid type for \`data\` (${typeof data}).`)
+        return this._createIdentifier(regex, data)
     }
 
-    _createIdentifier(regex, level = 'general', description, link) {
+    _createIdentifier(regex, data) {
+        if (typeof data !== "object") throw new Error(`Invalid type for \`data\` (${typeof data}).`)
         return {
             type : 'identifier',
-            level: level,
             regex: createRegExp(regex),
-            description,
-            link,
+            data,
         }
     }
 }

@@ -7,10 +7,10 @@ describe('text-part', function () {
         let text = (
             'Welcome to file1!\n' +
             'section1\n' +
-            'Hey there, highlight1.\n' +
+            'Hey there, identifier1.\n' +
             'This is what is happening.\n' +
             'section2\n' +
-            'See ya, highlight2.\n' +
+            'See ya, identifier2.\n' +
             'Wait, what?\n'
         )
 
@@ -19,72 +19,52 @@ describe('text-part', function () {
             sections   : [
                 'section1'
             ],
-            identifiers: {
-                critical: [
-                    'highlight1'
-                ]
-            }
+            identifiers: [
+                'identifier1'
+            ]
         })
         tp.addSectionIdentifier(/section2/)
-        tp.addIdentifier(/highlight2/)
+        tp.addIdentifier(/identifier2/)
 
         let result = tp.transform(text)
         expect(result).to.deep.equal([
             {
-                "data"    : [["Welcome to file1!"]],
-                "title"   : "file1",
-                "type"    : "section",
-                "visible" : false,
-                "match"   : null,
-                "disabled": false,
-                "level"   : undefined,
+                "lines": [["Welcome to file1!"]],
+                "title": "file1",
+                "type" : "section",
             },
             {
-                "data"    : [
+                "lines": [
                     ["section1"],
                     [
                         "Hey there, ",
                         {
-                            "data"       : "highlight1",
-                            "level"      : "critical",
-                            "type"       : "highlight",
-                            "link"       : undefined,
-                            "description": undefined
+                            "text": "identifier1",
+                            "type": "identifier",
                         },
                         "."
                     ],
                     ["This is what is happening."],
                 ],
-                "title"   : "section1",
-                "type"    : "section",
-                "visible" : false,
-                "match"   : "section1",
-                "disabled": false,
-                "level"   : "critical",
+                "title": "section1",
+                "type" : "section",
             },
             {
-                "data"    : [
+                "lines": [
                     ["section2"],
                     [
                         "See ya, ",
                         {
-                            "data"       : "highlight2",
-                            "level"      : "general",
-                            "type"       : "highlight",
-                            "link"       : undefined,
-                            "description": undefined
+                            "text": "identifier2",
+                            "type": "identifier",
                         },
                         "."
                     ],
                     ["Wait, what?"],
                     [""],
                 ],
-                "title"   : "section2",
-                "type"    : "section",
-                "match"   : "section2",
-                "visible" : false,
-                "disabled": false,
-                "level"   : "general",
+                "title": "section2",
+                "type" : "section",
             }
         ])
 
@@ -92,22 +72,18 @@ describe('text-part', function () {
         result = tp.transform(text)
         expect(result).to.deep.equal([
             {
-                "data"    : [
+                "lines": [
                     ["Welcome to file1!"],
                     ["section1"],
-                    ["Hey there, highlight1."],
+                    ["Hey there, identifier1."],
                     ["This is what is happening."],
                     ["section2"],
-                    ["See ya, highlight2."],
+                    ["See ya, identifier2."],
                     ["Wait, what?"],
                     [""],
                 ],
-                "disabled": false,
-                "level"   : undefined,
-                "match"   : null,
-                "title"   : "file1",
-                "type"    : "section",
-                "visible" : false,
+                "title": "file1",
+                "type" : "section",
             }
         ])
 
@@ -116,76 +92,54 @@ describe('text-part', function () {
             sections   : [
                 'section1'
             ],
-            identifiers: {
-                critical: [
-                    {
-                        regex      : 'highlight1',
-                        description: 'This is highlight #1.',
-                        link       : 'http://somewherebeyondthesea.waiting.for.me',
-                    }
-                ]
-            }
+            identifiers: [
+                {
+                    regex: 'identifier1',
+                }
+            ]
         })
         tp.addSectionIdentifier(/section2/)
-        tp.addIdentifier(/highlight2/, 'important', 'This is highlight 2!', 'http://www.google.com')
+        tp.addIdentifier(/identifier2/)
 
         result = tp.transform(text)
         expect(result).to.deep.equal([
             {
-                "data"    : [["Welcome to file1!"]],
-                "title"   : "file1",
-                "type"    : "section",
-                "visible" : false,
-                "match"   : null,
-                "disabled": false,
-                "level"   : undefined,
+                "lines": [["Welcome to file1!"]],
+                "title": "file1",
+                "type" : "section",
             },
             {
-                "data"    : [
+                "lines": [
                     ["section1"],
                     [
                         "Hey there, ",
                         {
-                            "data"       : "highlight1",
-                            "level"      : "critical",
-                            "type"       : "highlight",
-                            "link"       : 'http://somewherebeyondthesea.waiting.for.me',
-                            "description": 'This is highlight #1.'
+                            "text": "identifier1",
+                            "type": "identifier",
                         },
                         "."
                     ],
                     ["This is what is happening."],
                 ],
-                "title"   : "section1",
-                "type"    : "section",
-                "visible" : false,
-                "match"   : "section1",
-                "disabled": false,
-                "level"   : "critical",
+                "title": "section1",
+                "type" : "section",
             },
             {
-                "data"    : [
+                "lines": [
                     ["section2"],
                     [
                         "See ya, ",
                         {
-                            "data"       : "highlight2",
-                            "level"      : "important",
-                            "type"       : "highlight",
-                            "link"       : 'http://www.google.com',
-                            "description": 'This is highlight 2!'
+                            "text": "identifier2",
+                            "type": "identifier",
                         },
                         "."
                     ],
                     ["Wait, what?"],
                     [""],
                 ],
-                "title"   : "section2",
-                "type"    : "section",
-                "match"   : "section2",
-                "visible" : false,
-                "disabled": false,
-                "level"   : "important",
+                "title": "section2",
+                "type" : "section",
             }
         ])
 
@@ -194,50 +148,35 @@ describe('text-part', function () {
             sections   : [
                 'section1',
             ],
-            identifiers: {
-                general : [
-                    {
-                        regex      : [
-                            /highlight2/
-                        ],
-                        description: 'This is highlight #1.',
-                        link       : 'http://somewherebeyondthesea.waiting.for.me',
-                    }
-                ],
-                critical: [
-                    {
-                        regex      : [
-                            'highlight1',
-                        ],
-                        description: 'This is highlight #1.',
-                        link       : 'http://somewherebeyondthesea.waiting.for.me',
-                    }
-                ]
-            }
+            identifiers: [
+                {
+                    regex: [
+                        /identifier2/
+                    ],
+                },
+                {
+                    regex: [
+                        'identifier1',
+                    ],
+                }
+            ]
         })
 
         result = tp.transform(text)
         expect(result).to.deep.equal([
             {
-                "data"    : [["Welcome to file1!"]],
-                "title"   : "file1",
-                "type"    : "section",
-                "visible" : false,
-                "match"   : null,
-                "disabled": false,
-                "level"   : undefined,
+                "lines": [["Welcome to file1!"]],
+                "title": "file1",
+                "type" : "section",
             },
             {
-                "data"    : [
+                "lines": [
                     ["section1"],
                     [
                         "Hey there, ",
                         {
-                            "data"       : "highlight1",
-                            "level"      : "critical",
-                            "type"       : "highlight",
-                            "link"       : 'http://somewherebeyondthesea.waiting.for.me',
-                            "description": 'This is highlight #1.'
+                            "text": "identifier1",
+                            "type": "identifier",
                         },
                         "."
                     ],
@@ -245,23 +184,16 @@ describe('text-part', function () {
                     ["section2"],
                     ["See ya, ",
                         {
-                            "data"       : "highlight2",
-                            "level"      : "general",
-                            "type"       : "highlight",
-                            "link"       : 'http://somewherebeyondthesea.waiting.for.me',
-                            "description": 'This is highlight #1.'
+                            "text": "identifier2",
+                            "type": "identifier",
                         },
                         "."
                     ],
                     ["Wait, what?"],
                     [""],
                 ],
-                "title"   : "section1",
-                "type"    : "section",
-                "match"   : "section1",
-                "visible" : false,
-                "disabled": false,
-                "level"   : "critical",
+                "title": "section1",
+                "type" : "section",
             }
         ])
 
@@ -269,55 +201,43 @@ describe('text-part', function () {
         result = tp.transform(text)
         expect(result).to.deep.equal([
             {
-                "data"    : [
+                "lines": [
                     ["Welcome to file1!"],
                     ["section1"],
-                    ["Hey there, highlight1."],
+                    ["Hey there, identifier1."],
                     ["This is what is happening."],
                     ["section2"],
-                    ["See ya, highlight2."],
+                    ["See ya, identifier2."],
                     ["Wait, what?"],
                     [""],
                 ],
-                "disabled": false,
-                "level"   : undefined,
-                "match"   : null,
-                "title"   : "file1",
-                "type"    : "section",
-                "visible" : false,
+                "title": "file1",
+                "type" : "section",
             }
         ])
 
-        tp.addSectionIdentifier({regex: 'section2'})
+        tp.addSectionIdentifier('section2')
         result = tp.transform(text)
         expect(result).to.deep.equal([
             {
-                "data"    : [
+                "lines": [
                     ["Welcome to file1!"],
                     ["section1"],
-                    ["Hey there, highlight1."],
+                    ["Hey there, identifier1."],
                     ["This is what is happening."],
                 ],
-                "disabled": false,
-                "level"   : undefined,
-                "match"   : null,
-                "title"   : "file1",
-                "type"    : "section",
-                "visible" : false,
+                "title": "file1",
+                "type" : "section",
             },
             {
-                "data"    : [
+                "lines": [
                     ["section2"],
-                    ["See ya, highlight2."],
+                    ["See ya, identifier2."],
                     ["Wait, what?"],
                     [""],
                 ],
-                "disabled": false,
-                "level"   : undefined,
-                "match"   : "section2",
-                "title"   : "section2",
-                "type"    : "section",
-                "visible" : false,
+                "title": "section2",
+                "type" : "section",
             }
         ])
     })
