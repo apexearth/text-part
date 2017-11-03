@@ -149,9 +149,9 @@ class TextPart {
 
     /**
      * Transform an array of split into an array of sections.
-     * @param title - Start off with a section of this name.
-     * @param split - The result of a call to _split().
-     * @returns {Array} - An array containing the sections.
+     * @param title {string} - Start off with a section of this name.
+     * @param split {Array.<Array.<string>>} - The result of a call to _split().
+     * @returns {Array.<object>} - An array containing the sections.
      * @private
      */
     _transformSections(title, split) {
@@ -183,7 +183,7 @@ class TextPart {
     /**
      * Process a split, transforming it based on identifiers.
      * @param split - The result of a call to _split().
-     * @returns {Array|*}
+     * @returns {Array.<Array.<string|object>>}
      * @private
      */
     _transformIdentifiers(split) {
@@ -206,9 +206,10 @@ class TextPart {
 
     /**
      * Search collection of parts for identifiers, insert identifiers when found.
-     * @param parts {Array|Object} - An array of parts, or a section.
-     * @param identifier {*} - The regex to match.
-     * @returns {Array|*} - A modification of parts.
+     * @param parts {Array|object} - An array of parts, or a section.
+     * @param identifier {object} - The regex to match.
+     * @returns {Array.<string|object>} - A modification of parts.
+     * @private
      */
     _transformIdentifier(parts, identifier) {
         let {

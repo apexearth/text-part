@@ -29,7 +29,6 @@
     * [.loadIdentifiers(identifiers)](#TextPart+loadIdentifiers)
     * [.addSectionIdentifier(identifier, data, config)](#TextPart+addSectionIdentifier)
     * [.addIdentifier(identifier, data, config)](#TextPart+addIdentifier)
-    * [._transformIdentifier(parts, identifier)](#TextPart+_transformIdentifier) ⇒ <code>Array</code> \| <code>\*</code>
 
 <a name="new_TextPart_new"></a>
 
@@ -107,19 +106,6 @@ Add a section identifier. This is regex which will split the text blob when foun
 | identifier | <code>RegExp</code> \| <code>String</code> | The RegExp to use for identification. |
 | data | <code>object</code> | Data to associate with the identifier and anything the identifier creates. |
 | config | <code>object</code> | The config options to use. |
-
-<a name="TextPart+_transformIdentifier"></a>
-
-### textPart._transformIdentifier(parts, identifier) ⇒ <code>Array</code> \| <code>\*</code>
-Search collection of parts for identifiers, insert identifiers when found.
-
-**Kind**: instance method of [<code>TextPart</code>](#TextPart)  
-**Returns**: <code>Array</code> \| <code>\*</code> - - A modification of parts.  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| parts | <code>Array</code> \| <code>Object</code> | An array of parts, or a section. |
-| identifier | <code>\*</code> | The regex to match. |
 
 <a name="flatten"></a>
 
