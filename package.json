@@ -1,7 +1,7 @@
 {
   "name": "text-part",
   "version": "1.0.0",
-  "description": "",
+  "description": "Parse blobs of text into sections, lines, and highlights.",
   "main": "src/index.js",
   "scripts": {
     "test": "npm-run-all eslint mocha",
