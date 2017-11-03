@@ -23,7 +23,7 @@
 
 * [TextPart](#TextPart)
     * [new TextPart(name, sections, identifiers, config)](#new_TextPart_new)
-    * [.transform(text)](#TextPart+transform) ⇒ <code>Array</code>
+    * [.transform(text)](#TextPart+transform) ⇒ <code>Array.&lt;(object\|Array.&lt;(string\|object)&gt;)&gt;</code>
     * [.clearRules()](#TextPart+clearRules)
     * [.loadSections(sections)](#TextPart+loadSections)
     * [.loadIdentifiers(identifiers)](#TextPart+loadIdentifiers)
@@ -43,7 +43,7 @@
 
 <a name="TextPart+transform"></a>
 
-### textPart.transform(text) ⇒ <code>Array</code>
+### textPart.transform(text) ⇒ <code>Array.&lt;(object\|Array.&lt;(string\|object)&gt;)&gt;</code>
 Transform a file data string into an array of parts.
 The top level array represents the lines.
 The arrays, called parts, within each line represent parts within the line.
@@ -51,9 +51,9 @@ The arrays, called parts, within each line represent parts within the line.
 
 **Kind**: instance method of [<code>TextPart</code>](#TextPart)  
 
-| Param | Description |
-| --- | --- |
-| text | The text to transform into parts. |
+| Param | Type | Description |
+| --- | --- | --- |
+| text | <code>string</code> | The text to transform into parts. |
 
 <a name="TextPart+clearRules"></a>
 
