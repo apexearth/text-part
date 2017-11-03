@@ -8,6 +8,7 @@
     "eslint": "eslint src/**/*.spec.js",
     "mocha": "nyc mocha src/**/*.spec.js"
   },
+  "repository": "https://github.com/apexearth/text-part",
   "keywords": [
     "transform",
     "text",
