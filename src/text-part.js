@@ -3,10 +3,10 @@ const iterateRegex = require('regex-foreach')
 class TextPart {
     /**
      *
-     * @param name - The name to describe all text types which are processed by the TextPart instance.
-     * @param sections - An array of section identifiers. (RegExp/string)
-     * @param identifiers - An array of identifiers. (RegExp/string)
-     * @param config - Configuration options to define how TextPart transforms.
+     * @param name {string} - The name to describe all text types which are processed by the TextPart instance.
+     * @param sections {Array.<string|object>} - An array of section identifiers. (RegExp/string)
+     * @param identifiers {Array.<string|object>} - An array of identifiers. (RegExp/string)
+     * @param config {object} - Configuration options to define how TextPart transforms.
      */
     constructor({
         name = "",
@@ -20,6 +20,7 @@ class TextPart {
             identifiers: []
         }
         this.config = Object.assign({
+            sections       : true,
             lineLengthLimit: undefined
         }, config)
 
@@ -37,14 +38,23 @@ class TextPart {
      */
     transform(text) {
         let split = this._split(text)
-        split     = this._transformSections(this.name || split[0][0], split)
-        split     = this._transformIdentifiers(split)
+        if (this.config.sections) {
+            split = this._transformSections(this.name || split[0][0], split)
+        }
+        split = this._transformIdentifiers(split)
         return split
     }
 
-    _split(data) {
+    /**
+     * Split text into an array of line parts. [['Line One'],['Line Two']]
+     * Each element in the array has a .lineNumber
+     * @param text - The text to split into the array.
+     * @returns {Array}
+     * @private
+     */
+    _split(text) {
         let lineNumber = 0
-        return data.split('\n')
+        return text.split('\n')
             .map(line => {
                 if (this.config.lineLengthLimit) {
                     line = [this._limitLineLength(line, this.config.lineLengthLimit)]
@@ -56,15 +66,29 @@ class TextPart {
             })
     }
 
-    _limitLineLength(data, limit) {
-        return data.length > limit ? data.substring(0, limit) : data
+    /**
+     * Return a string based on the given string no greater than the limit in length.
+     * @param text {string} - The text to limit.
+     * @param limit {number} - The limit.
+     * @returns {string}
+     * @private
+     */
+    _limitLineLength(text, limit) {
+        return text.length > limit ? text.substring(0, limit) : text
     }
 
+    /**
+     * Clear all added identifiers.
+     */
     clearRules() {
         this.rules.sections    = []
         this.rules.identifiers = []
     }
 
+    /**
+     * Load an array of section identifiers.
+     * @param sections {Array.<RegExp|string>} - An array of strings or RegExp to use as identifiers.
+     */
     loadSections(sections) {
         for (let i in sections) {
             if (!sections.hasOwnProperty(i)) continue
@@ -73,6 +97,15 @@ class TextPart {
         }
     }
 
+    /**
+     * Load an array of identifiers.
+     * @param identifiers {Array.<string|object>} - An array of objects or strings to be loaded as identifiers.
+     * [
+     *    'identifier1',
+     *    { regex: 'identifier2', data: {} },
+     *    { regex: ['identifier3','identifier4'], data: {} }
+     * ]
+     */
     loadIdentifiers(identifiers) {
         for (let i in identifiers) {
             if (!identifiers.hasOwnProperty(i)) continue
@@ -91,20 +124,22 @@ class TextPart {
 
     /**
      * Add a section identifier. This is regex which will split the text blob when found.
-     * @param identifier
-     * @param data
+     * @param identifier {RegExp|String} - The RegExp to use for identification.
+     * @param data {object} - Data to associate with the identifier and anything the identifier creates.
+     * @param config {object} - The config options to use.
      */
-    addSectionIdentifier(identifier, data = {}) {
-        this.rules.sections.push(this._createSectionIdentifier(identifier, data))
+    addSectionIdentifier(identifier, data = {}, config) {
+        this.rules.sections.push(this._createSectionIdentifier(identifier, data, config))
     }
 
     /**
-     * @param identifier {object} as created by .createIdentifier
-     * @param data
+     * @param identifier {RegExp|String} - The RegExp to use for identification.
+     * @param data {object} - Data to associate with the identifier and anything the identifier creates.
+     * @param config {object} - The config options to use.
      */
-    addIdentifier(identifier, data = {}) {
+    addIdentifier(identifier, data = {}, config) {
         if (typeof identifier === 'string' || identifier.constructor === RegExp) {
-            identifier = this._createIdentifier(identifier, data)
+            identifier = this._createIdentifier(identifier, data, config)
         }
         if (identifier.type !== 'identifier') {
             throw new Error(`Tried to add something which was not an identifier. (${identifier} (${typeof identifier}))`)
@@ -113,18 +148,18 @@ class TextPart {
     }
 
     /**
-     * Transform an array of lines into an array of sections.
+     * Transform an array of split into an array of sections.
      * @param title - Start off with a section of this name.
-     * @param lines - The lines to transform into sections.
+     * @param split - The result of a call to _split().
      * @returns {Array} - An array containing the sections.
      * @private
      */
-    _transformSections(title, lines) {
-        let currentSection = this._createTransformedSection(title, [], {})
+    _transformSections(title, split) {
+        let currentSection = this._createTransformedSection(title)
         let sections       = [currentSection]
         // Loop through each line and load them into sections.
         // Create new sections on the go as section matches are found.
-        lines.forEach((parts) => {
+        split.forEach((parts) => {
             // Create a new section, if needed.
             this.rules.sections.forEach(sectionIdentifier => {
                 for (let i in parts) {
@@ -132,7 +167,7 @@ class TextPart {
                     let part  = parts[i]
                     let match = null
                     if (match = sectionIdentifier.regex.exec(part)) {
-                        if (sectionIdentifier.norepeat && match[0] === currentSection.match) continue // Skip
+                        if (sectionIdentifier.config.norepeat && part === currentSection.title) continue // Skip
                         currentSection = this._createTransformedSection(part, [], sectionIdentifier.data)
                         sections.push(currentSection)
                         break
@@ -145,6 +180,12 @@ class TextPart {
         return sections
     }
 
+    /**
+     * Process a split, transforming it based on identifiers.
+     * @param split - The result of a call to _split().
+     * @returns {Array|*}
+     * @private
+     */
     _transformIdentifiers(split) {
         const iterateIdentifiers = (parts) => {
             this.rules.identifiers.forEach(identifier => {
@@ -165,9 +206,9 @@ class TextPart {
 
     /**
      * Search collection of parts for identifiers, insert identifiers when found.
-     * @param parts {Array|Object} An array of parts, or a section.
-     * @param identifier {*}       The regex to match.
-     * @returns {*}                A modification of parts.
+     * @param parts {Array|Object} - An array of parts, or a section.
+     * @param identifier {*} - The regex to match.
+     * @returns {Array|*} - A modification of parts.
      */
     _transformIdentifier(parts, identifier) {
         let {
@@ -194,6 +235,33 @@ class TextPart {
         return newParts
     }
 
+    /**
+     * Create a transformed section. (end result)
+     * @param title - The title of the section.
+     * @param lines - An array of lines to start the section off with.
+     * @param data - Data related to the section.
+     * @returns {{type,title,lines,data}|*}
+     * @private
+     */
+    _createTransformedSection(title, lines = [], data = {}) {
+        if (typeof title !== 'string') throw new Error(`Invalid type for \`title\` (${typeof title}).`)
+        if (!Array.isArray(lines)) throw new Error(`Invalid type for \`lines\` (${typeof lines}).`)
+        if (data && typeof data !== "object") throw new Error(`Invalid type for \`data\` (${typeof data}).`)
+        return Object.assign({
+            type: 'section',
+            title,
+            lines,
+        }, data)
+    }
+
+    /**
+     * Create a transformed identifier.
+     * This is the result of a regex match on a line.
+     * @param text - The text of the matched identifier.
+     * @param data - Data related to the identifier.
+     * @returns {{type,text,data}|*}
+     * @private
+     */
     _createTransformedIdentifier(text, data) {
         return Object.assign({
             type: 'identifier',
@@ -201,25 +269,35 @@ class TextPart {
         }, data)
     }
 
-    _createTransformedSection(title, lines, data) {
-        return Object.assign({
-            type : 'section',
-            title: title,
-            lines: lines,
-        }, data)
-    }
-
-    _createSectionIdentifier(regex, data = {}) {
+    /**
+     * Create a section identifier.
+     * A section identifier is used to identify when sections should be created.
+     * @param regex - The RegExp to use in identification.
+     * @param data - The data to associate with the identifier.
+     * @param config - The config options to use.
+     * @returns {{type, regex, data, config}|*}
+     * @private
+     */
+    _createSectionIdentifier(regex, data = {}, config = {norepeat: false}) {
         if (typeof data !== "object") throw new Error(`Invalid type for \`data\` (${typeof data}).`)
-        return this._createIdentifier(regex, data)
+        return this._createIdentifier(regex, data, config)
     }
 
-    _createIdentifier(regex, data) {
+    /**
+     * Create an identifier which can have data associated with it.
+     * @param regex - The RegExp to use in identification.
+     * @param data - The data to associate with the identifier.
+     * @param config - The config options to use.
+     * @returns {{type: string, regex, data: {}, config: *}}
+     * @private
+     */
+    _createIdentifier(regex, data = {}, config) {
         if (typeof data !== "object") throw new Error(`Invalid type for \`data\` (${typeof data}).`)
         return {
             type : 'identifier',
             regex: createRegExp(regex),
             data,
+            config,
         }
     }
 }
@@ -228,10 +306,21 @@ module.exports = TextPart
 
 
 // Utility functions
+/**
+ * Flatten an array.
+ * @param array {Array.<Array>}
+ * @returns {Array}
+ */
 function flatten(array) {
     return [].concat.apply([], array)
 }
 
+/**
+ * Create a RegExp object from a string or RegExp object.
+ * @param regex {object|RegExp} - The regex to create a RegExp from.
+ * @param regexSafe - Do we need to escape certain characters in `regex`?
+ * @returns {RegExp}
+ */
 function createRegExp(regex, regexSafe = false) {
     if (regex.constructor !== RegExp) {
         if (!regexSafe) {
