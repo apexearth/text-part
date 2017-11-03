@@ -33,8 +33,8 @@ class TextPart {
      * The top level array represents the lines.
      * The arrays, called parts, within each line represent parts within the line.
      *   Some parts are simple strings, others represent things such as identifiers.
-     * @param text - The text to transform into parts.
-     * @returns {Array}
+     * @param text {string} - The text to transform into parts.
+     * @returns {Array.<object|Array.<string|object>>}
      */
     transform(text) {
         let split = this._split(text)
