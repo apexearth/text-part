@@ -1,6 +1,31 @@
 <a name="TextPart"></a>
 
 ## TextPart
+### Synopsis
+
+Transform blobs of text:
+```
+One
+Two
+Three Elephants walking.
+Four tigers sleeping.
+```
+Into array structures using `RegExp` identifiers:
+```
+[
+  {
+    "type": "section",
+    "title": "Example"
+    "lines": [
+      [ "One" ], [ "Two" ],
+      [ "Three ", { "type": "identifier", text: "Elephants", extra: "data"}, " walking."],
+      [ "Four tigers sleeping." ]
+    ],
+    "extra": "data"
+  }
+]
+```
+
 ### Usage:
 
 - Install: `npm install text-part --save`
