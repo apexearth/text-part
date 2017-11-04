@@ -1,5 +1,10 @@
 const iterateRegex = require('regex-foreach')
 
+/**
+ * ### Usage: `npm install text-part --save`
+ * ### Example: [example/example.js](example/example.js)
+ */
+
 class TextPart {
     /**
      *
@@ -93,7 +98,11 @@ class TextPart {
         for (let i in sections) {
             if (!sections.hasOwnProperty(i)) continue
             let identifier = sections[i]
-            this.addSectionIdentifier(identifier)
+            if (typeof identifier === 'object') {
+                this.addSectionIdentifier(identifier.regex, identifier.data)
+            } else {
+                this.addSectionIdentifier(identifier, {})
+            }
         }
     }
 
@@ -223,6 +232,7 @@ class TextPart {
             let result    = []
             let lastIndex = 0
             iterateRegex(regex, part, (value, index) => {
+                if (lastIndex === 0 && index === 0) return
                 result    = result.concat([
                     part.substring(lastIndex, index),
                     this._createTransformedIdentifier(value, data)
