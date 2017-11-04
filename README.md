@@ -1,8 +1,9 @@
 <a name="TextPart"></a>
 
 ## TextPart
-### Usage: `npm install text-part --save`
-### Example: [example/example.js](example/example.js)
+### Usage:
+Install: `npm install text-part --save`   
+Example: [example.js](example/example.js)   
 
 **Kind**: global class  
 

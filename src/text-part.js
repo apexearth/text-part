@@ -1,7 +1,8 @@
 const iterateRegex = require('regex-foreach')
 
 /**
- * ### Usage: `npm install text-part --save`
+ * ### Usage:
+ * `npm install text-part --save`
  * ### Example: [example/example.js](example/example.js)
  */
 
