@@ -2,8 +2,10 @@ const iterateRegex = require('regex-foreach')
 
 /**
  * ### Usage:
- * `npm install text-part --save`
- * ### Example: [example/example.js](example/example.js)
+ *
+ * - Install: `npm install text-part --save`
+ * - Example: [example.js](example/example.js)
+ *
  */
 
 class TextPart {
