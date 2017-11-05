@@ -15,7 +15,9 @@
     "transform",
     "text",
     "part",
-    "parse"
+    "parse",
+    "section",
+    "identifier"
   ],
   "eslintConfig": {
     "parserOptions": {
