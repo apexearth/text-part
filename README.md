@@ -51,7 +51,7 @@ Into array structures using `RegExp` identifiers:
 | name | <code>string</code> | The name to describe all text types which are processed by the TextPart instance. |
 | sections | <code>Array.&lt;(string\|object)&gt;</code> | An array of section identifiers. (RegExp/string) |
 | identifiers | <code>Array.&lt;(string\|object)&gt;</code> | An array of identifiers. (RegExp/string) |
-| config | <code>object</code> | Configuration options to define how TextPart transforms. |
+| config | <code>Object</code> | Configuration options to define how TextPart transforms. |
 
 <a name="TextPart+transform"></a>
 

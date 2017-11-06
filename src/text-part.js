@@ -39,7 +39,12 @@ class TextPart {
      * @param name {string} - The name to describe all text types which are processed by the TextPart instance.
      * @param sections {Array.<string|object>} - An array of section identifiers. (RegExp/string)
      * @param identifiers {Array.<string|object>} - An array of identifiers. (RegExp/string)
-     * @param config {object} - Configuration options to define how TextPart transforms.
+     * @param config {{
+     *     sections: boolean,
+     *     lineLengthLimit: number,
+     *     sectionData: object,
+     *     identifierData: object
+     * }} - Configuration options to define how TextPart transforms.
      */
     constructor({
         name = "",
@@ -54,7 +59,9 @@ class TextPart {
         }
         this.config = Object.assign({
             sections       : true,
-            lineLengthLimit: undefined
+            lineLengthLimit: undefined,
+            sectionData    : undefined,
+            identifierData : undefined,
         }, config)
 
         this.loadSections(sections)
@@ -260,9 +267,10 @@ class TextPart {
             let result    = []
             let lastIndex = 0
             iterateRegex(regex, part, (value, index) => {
-                if (lastIndex === 0 && index === 0) return
+                if (lastIndex !== index) {
+                    result.push(part.substring(lastIndex, index))
+                }
                 result    = result.concat([
-                    part.substring(lastIndex, index),
                     this._createTransformedIdentifier(value, data)
                 ])
                 lastIndex = index + value.length
@@ -286,6 +294,7 @@ class TextPart {
         if (typeof title !== 'string') throw new Error(`Invalid type for \`title\` (${typeof title}).`)
         if (!Array.isArray(lines)) throw new Error(`Invalid type for \`lines\` (${typeof lines}).`)
         if (data && typeof data !== "object") throw new Error(`Invalid type for \`data\` (${typeof data}).`)
+        data = Object.assign({}, data, this.config.sectionData)
         return Object.assign({
             type: 'section',
             title,
@@ -302,6 +311,7 @@ class TextPart {
      * @private
      */
     _createTransformedIdentifier(text, data) {
+        data = Object.assign({}, data, this.config.identifierData)
         return Object.assign({
             type: 'identifier',
             text,

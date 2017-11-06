@@ -4,7 +4,7 @@ const TextPart = require('./text-part')
 describe('text-part', function () {
 
     it('good transformations', function () {
-        let text = (
+        let text  = (
             'Welcome to file1!\n' +
             'section1\n' +
             'Hey there, identifier1.\n' +
@@ -326,6 +326,27 @@ describe('text-part', function () {
             )
 
             expect(lines[0][0]).to.equal('1234567890')
+            expect(lines[1][0]).to.equal('1234')
+        })
+        it('sectionData and identifierData', () => {
+            let tp       = new TextPart({
+                identifiers: ['12345'],
+                config     : {
+                    sectionData   : {data1: "hey there"},
+                    identifierData: {data2: "goodbye"}
+                }
+            })
+            let sections = tp.transform(
+                "1234567890\n" +
+                "1234"
+            )
+            expect(sections[0].data1).to.equal(tp.config.sectionData.data1)
+            let lines = sections[0].lines
+            expect(lines[0][0]).to.deep.equal({
+                "data2": "goodbye",
+                "text": "12345",
+                "type": "identifier",
+            })
             expect(lines[1][0]).to.equal('1234')
         })
 
