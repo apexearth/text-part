@@ -133,7 +133,7 @@ class TextPart {
         for (let i in sections) {
             if (!sections.hasOwnProperty(i)) continue
             let identifier = sections[i]
-            if (typeof identifier === 'object') {
+            if (identifier.regex) {
                 this.addSectionIdentifier(identifier.regex, identifier.data)
             } else {
                 this.addSectionIdentifier(identifier, {})
