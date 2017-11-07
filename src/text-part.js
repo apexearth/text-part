@@ -275,7 +275,7 @@ class TextPart {
                 ])
                 lastIndex = index + value.length
             })
-            if (lastIndex !== part.length) {
+            if (result.length === 0 || lastIndex !== part.length) {
                 result.push(part.substring(lastIndex))
             }
             return result

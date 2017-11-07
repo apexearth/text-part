@@ -1,6 +1,6 @@
 {
   "name": "text-part",
-  "version": "1.1.3",
+  "version": "1.1.4",
   "description": "Parse blobs of text into sections, lines, and identifiers.",
   "main": "src/index.js",
   "scripts": {
