@@ -275,7 +275,9 @@ class TextPart {
                 ])
                 lastIndex = index + value.length
             })
-            result.push(part.substring(lastIndex))
+            if (lastIndex !== part.length) {
+                result.push(part.substring(lastIndex))
+            }
             return result
         }))
         newParts.lineNumber = parts.lineNumber // TODO: We have to be careful to not lose our line numbers.
